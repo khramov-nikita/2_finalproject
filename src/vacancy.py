@@ -3,9 +3,13 @@ import json
 
 
 class Item(ABC):
+    """
+    Абстрактный метод для вакансии
+    """
 
     @abstractmethod
     def to_dict(self):
+
         pass
 
     @abstractmethod
@@ -14,6 +18,9 @@ class Item(ABC):
 
 
 class Processor(ABC):
+    """
+    Абстрактный метод для процессора вакансий
+    """
 
     @abstractmethod
     def add_vacancy(self, *args):
@@ -21,6 +28,9 @@ class Processor(ABC):
 
 
 class Vacancy(Item):
+    """
+    Класс для репрезентации вакансии
+    """
 
     __slots__ = ("name", "link", "pay", "area", "description")
 
@@ -48,17 +58,27 @@ class VacanciesProcessor(Processor):
 
     __slots__ = "vacancies"
 
-    def __init__(self, hh_data, vacancies: None | list = None):
+    def __init__(self, vacancies: None | list = None):
         self.__vacancies = vacancies if vacancies else []
-        self.hh_data = hh_data
 
-    def create_vacancy(self):
-        for vacancy in self.hh_data:
+    def create_vacancies(self, hh_data):
+        for vacancy in hh_data:
             self.add_vacancy(
                 Vacancy(
-                    vacancy["name"], vacancy["alternate_url"], vacancy["salary"], vacancy["area"], vacancy["snippet"]
+                    vacancy["name"],
+                    vacancy["alternate_url"],
+                    vacancy["salary"],
+                    vacancy["area"],
+                    f'Обязанности: {vacancy["snippet"]["requirement"]}\n'
+                    f'Требования: {vacancy["snippet"]["responsibility"]}',
                 )
             )
+
+    def vacancy_to_dict(self):
+        result =[]
+        for vacancy in self.__vacancies:
+            result.append(vacancy.to_dict())
+        return result
 
     def add_vacancy(self, *args: Vacancy):
         for arg in args:
@@ -70,7 +90,7 @@ class VacanciesProcessor(Processor):
     def __str__(self):
         result_list = []
         for vacancy in self.__vacancies:
-            result_list.append(f"{vacancy.name}: {vacancy.description}\n")
+            result_list.append(f"{vacancy.name: ^60}\n{vacancy.description}\n\n")
         return "".join(result_list)
 
 

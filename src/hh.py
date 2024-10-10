@@ -10,6 +10,9 @@ dump_path = os.path.join(path[:-3], "data", "result.json")
 
 
 class Parser(ABC):
+    """
+    Абстрактный класс парсера
+    """
 
     @abstractmethod
     def load_vacancies(self, keyword):
@@ -19,9 +22,7 @@ class Parser(ABC):
 class HH(Parser):
     """
     Класс для работы с API HeadHunter
-    Класс Parser является родительским классом, который вам необходимо реализовать
     """
-
 
     def __init__(self):
         self.url = "https://api.hh.ru/vacancies"
@@ -31,6 +32,9 @@ class HH(Parser):
         # super().__init__(file_worker)
 
     def load_vacancies(self, keyword):
+        """
+        Метод для выгрузки вакансий
+        """
         self.params["text"] = keyword
 
         while self.params.get("page") != 2:
@@ -40,9 +44,8 @@ class HH(Parser):
             self.params["page"] += 1
 
 
-
 if __name__ == "__main__":
     processor = HH()
     processor.load_vacancies("Python developer")
-    with open(dump_path, 'w', encoding="utf-16") as f:
+    with open(dump_path, "w", encoding="utf-16") as f:
         json.dump(processor.vacancies, f, ensure_ascii=False, indent=4)
