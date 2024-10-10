@@ -48,8 +48,17 @@ class VacanciesProcessor(Processor):
 
     __slots__ = "vacancies"
 
-    def __init__(self, vacancies: None | list = None):
+    def __init__(self, hh_data, vacancies: None | list = None):
         self.__vacancies = vacancies if vacancies else []
+        self.hh_data = hh_data
+
+    def create_vacancy(self):
+        for vacancy in self.hh_data:
+            self.add_vacancy(
+                Vacancy(
+                    vacancy["name"], vacancy["alternate_url"], vacancy["salary"], vacancy["area"], vacancy["snippet"]
+                )
+            )
 
     def add_vacancy(self, *args: Vacancy):
         for arg in args:
@@ -66,12 +75,4 @@ class VacanciesProcessor(Processor):
 
 
 if __name__ == "__main__":
-    vacancy_1 = Vacancy("1", "2", "3", "4", "5")
-    vacancy_2 = Vacancy("6", "7", "8", "9", "0")
-    data = VacanciesProcessor()
-    data.add_vacancy(vacancy_1)
-    data.add_vacancy(vacancy_2)
-    print(vacancy_1.to_json())
-    print(vacancy_2.to_dict())
-    print(data)
-
+    pass
