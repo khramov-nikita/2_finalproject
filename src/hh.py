@@ -1,6 +1,12 @@
+import os
+
 import requests
 import json
 from abc import ABC, abstractmethod
+
+
+path = os.path.dirname(__file__)
+dump_path = os.path.join(path[:-3], "data", "result.json")
 
 
 class Parser(ABC):
@@ -25,8 +31,15 @@ class HH(Parser):
 
     def load_vacancies(self, keyword):
         self.params["text"] = keyword
-        while self.params.get("page") != 20:
+        while self.params.get("page") != 2:
             response = requests.get(self.url, headers=self.headers, params=self.params)
             vacancies = response.json()["items"]
             self.vacancies.extend(vacancies)
             self.params["page"] += 1
+
+
+if __name__ == "__main__":
+    processor = HH()
+    processor.load_vacancies("Python developer")
+    with open(dump_path, 'w', encoding="utf-16") as f:
+        json.dump(processor.vacancies, f, ensure_ascii=False, indent=4)
