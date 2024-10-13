@@ -9,7 +9,6 @@ class Item(ABC):
 
     @abstractmethod
     def to_dict(self):
-
         pass
 
     @abstractmethod
@@ -63,26 +62,30 @@ class VacanciesProcessor(Processor):
 
     def create_vacancies(self, hh_data):
         for vacancy in hh_data:
+            if isinstance(vacancy["salary"], dict):
+                salary = vacancy["salary"]
+            else:
+                salary = "Не указано"
             self.add_vacancy(
                 Vacancy(
                     vacancy["name"],
                     vacancy["alternate_url"],
-                    vacancy["salary"],
+                    salary,
                     vacancy["area"],
                     f'Обязанности: {vacancy["snippet"]["requirement"]}\n'
                     f'Требования: {vacancy["snippet"]["responsibility"]}',
                 )
             )
 
-    def vacancy_to_dict(self):
-        result =[]
+    def vacancy_to_list(self):
+        result = []
         for vacancy in self.__vacancies:
             result.append(vacancy.to_dict())
         return result
 
     def add_vacancy(self, *args: Vacancy):
         for arg in args:
-            if issubclass(arg.__class__, Vacancy):
+            if isinstance(arg, Vacancy):
                 self.__vacancies.append(arg)
             else:
                 raise TypeError
@@ -90,7 +93,13 @@ class VacanciesProcessor(Processor):
     def __str__(self):
         result_list = []
         for vacancy in self.__vacancies:
-            result_list.append(f"{vacancy.name: ^60}\n{vacancy.description}\n\n")
+            if isinstance(vacancy.pay, dict):
+                result_list.append(
+                    f'{vacancy.name: ^60}\n{vacancy.description}\n'
+                    f'Зарплата: {vacancy.pay["from"]} {vacancy.pay["currency"]}\n\n'
+                )
+            else:
+                result_list.append(f"{vacancy.name: ^60}\n{vacancy.description}\nЗарплата: {vacancy.pay}\n\n")
         return "".join(result_list)
 
 
